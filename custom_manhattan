@@ -1,0 +1,54 @@
+#manhattan
+#modified base code from https://www.r-graph-gallery.com/101_Manhattan_plot.html
+
+don <- dat1 %>% 
+  
+  # Compute chromosome size
+  group_by(Chromosome) %>% 
+  summarise(chr_len=max(Position)) %>% 
+  
+  # Calculate cumulative position of each chromosome
+  mutate(tot=cumsum(chr_len)-chr_len) %>%
+  select(-chr_len) %>%
+  
+  # Add this info to the initial dataset
+  left_join(dat1, ., by=c("Chromosome"="Chromosome")) %>%
+  
+  # Add a cumulative position of each SNP
+  arrange(Chromosome, Position) %>%
+  mutate( Chromosomes=Position+tot)
+  
+  
+  axisdf = don %>% group_by(Chromosome) %>% summarize(center=( max(Chromosomes) + min(Chromosomes) ) / 2 )
+  
+  
+ p1<-  ggplot(don, aes(x=Chromosomes, y=-log10(P.value))) +
+    
+    # Show all points
+    geom_point( aes(color=as.factor(Chromosome)), alpha=0.8, size=2.0) +
+    scale_color_manual(values = rep(c("black", "grey"), 22 )) +
+    
+    # custom X axis:
+    scale_x_continuous( label = axisdf$Chromosome, breaks= axisdf$center ) +
+    scale_y_continuous(expand = c(0, 0) ,limits=c(0,8.5)) +   
+	ylab("-log10(P)")+ ylim(c(0,6))+
+	
+  
+    # Custom the theme:
+	theme(axis.text.y   = element_text(size=24),
+        axis.text.x   = element_text(size=24),
+        axis.title.y  = element_text(size=24),
+        axis.title.x  = element_text(size=24),
+        panel.background = element_blank(),
+        panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        axis.line = element_line(colour = "black"),
+		strip.text = element_text(size = 24),
+		legend.title = element_blank(),
+		legend.position="none",
+        panel.border = element_rect(colour = "black", fill=NA, size=1)
+  )
+    
+  p1
+  
+ggsave("fig3_manhattan.png", width = 10, height = 7.5, device='png', dpi=700)
