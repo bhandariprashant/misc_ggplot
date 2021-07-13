@@ -15,6 +15,7 @@ p<- ggplot(dat1) +
         panel.grid.major = element_blank(), 
         panel.grid.minor = element_blank(),
         axis.line = element_line(colour = "black"),
+	 strip.text = element_text(size = 24), #increases the font size at facet wrap
         panel.border = element_rect(colour = "black", fill=NA, size=1)
   )
   
