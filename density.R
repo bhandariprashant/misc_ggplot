@@ -1,8 +1,8 @@
 p<- ggplot(dat2) +
 
-  geom_density( aes(x = FN_2019, y = ..density..),fill="#69b3a2",alpha=.5) + scale_color_npg()+
-  geom_density( aes(x = FN_2020, y = ..density..),fill="#404080",alpha=.5)+ scale_color_npg()+
-  xlab("Fruit Number") +
+  geom_density( aes(x = x1, y = ..density..),fill="#69b3a2",alpha=.5) + scale_color_npg()+
+  geom_density( aes(x = x2, y = ..density..),fill="#404080",alpha=.5)+ scale_color_npg()+
+  xlab("xlab") +
   
   theme(axis.text.y   = element_text(size=12),
         axis.text.x   = element_text(size=9,angle = 90, vjust = 0.5, hjust=1),
