@@ -1,0 +1,98 @@
+library(GGally)
+lowerFn <- function(data, mapping, method = "lm", ...) {
+  p <- ggplot(data = data, mapping = mapping) +
+    geom_point(colour = "black") +
+    geom_smooth(method = method, color = "#E64B35FF", ...)
+  p
+}
+
+diagFn <- function(data,mapping,...){
+  p<- ggplot(data = data,mapping = mapping)+
+    geom_histogram(aes(y=..density..), colour="black", fill="white")+
+    geom_density()
+  p
+}
+
+p1 <- ggpairs(dat1_scaled,lower=list(continuous = wrap(lowerFn, method = "lm")),
+        diag = list(discrete="densityDiag", continuous = wrap("densityDiag")),
+        upper = list(continuous = wrap("cor",color="black")))+
+  geom_rangeframe()+coord_cartesian(clip="off")+
+  theme_tufte(ticks = TRUE,base_size = 11,base_family = "serif")
+
+p1
+
+
+library(tidyverse)
+library(ggsci)
+library(patchwork)
+library(broman)
+library(ggpubr)
+library(cowplot)
+library(ggthemes)
+
+###pcs per GWA snp
+
+pcs_inbred <- ggplot(dat1, aes(x=PC1, y=PC2))+
+  geom_point(position=position_jitter(h=0.01, w=0.01),size=1,alpha=1)+
+  geom_hline(yintercept = 0,linetype="dashed")+	geom_vline(xintercept = 0,linetype="dashed")+
+  labs(x="Principal component 1",y="Principal component 2")+
+  ggtitle("PCA of breeding lines")+
+  #geom_rangeframe()+coord_cartesian(clip="off")+
+  theme_tufte(ticks = TRUE,base_size = 11,base_family = "serif")+theme_karl()+
+  theme(rect = element_blank())
+
+
+pcs_inbred  
+
+
+library(ggcharts)
+a <- lollipop_chart(F_inbred,y=F,x=INDV,line_size = 0.5,
+               line_color = "black",point_size = 1,alpha=1)+
+  labs(y="y",x="x")+
+  ggtitle("y")+
+  geom_rangeframe()+
+  theme_tufte(ticks = TRUE,base_size = 11,base_family = "serif")+
+  theme(legend.position = "none",
+        axis.text.y = element_blank(), axis.ticks.y=element_blank()
+        )
+a
+
+dat1$order1 <- factor(dat1$training_pop,levels = c("a","b","GWA+c","d"))
+dat1$order2 <- factor(dat1$trait,levels = c("a","v","z","y"))
+
+
+p1 <-ggplot(dat1) +
+  geom_tufteboxplot(aes(x=order1, y=PA,color=order2),median.type = "line", hoffset = 0, width=4)+
+  ggtitle(expression(paste("SVM-linear (", F[2],")",sep=""))) +
+  labs(x="",y="Accuracy")+scale_y_continuous(n.breaks=7,limits = c(-0.5,0.8))+
+  facet_wrap(~order2,ncol = 4)+
+  scale_color_manual(values = c("black","#00A087FF","#3C5488FF","#E64B35FF"))+
+  geom_rangeframe(aes(x=training_pop,y=PA))+coord_cartesian(clip="off")+ 
+  theme_tufte(ticks = TRUE,base_size = 11,base_family = "serif")+
+  theme(legend.position = "none",axis.text.x = element_text(angle=45,hjust=1,size=11),
+        strip.text.x = element_text(size=0),
+        panel.grid.major.y = element_line(color = "#F5F1ED",
+                                          size = 0.5,
+                                          linetype = 2))
+p1
+
+
+
+
+stat_summary(geom="text", fun.y=,
+             aes(label=sprintf("%1.1f", ..y..), color=factor(cyl)),
+             position=position_nudge(x=0.33), size=3.5) 
+
+
+p1 <-ggplot(dat1, aes(x=order1, y=MSE,fill=order2)) +
+  geom_boxplot()+stat_boxplot(geom = "errorbar")+labs(x="",y="mse")+scale_fill_npg()+theme_karl()
+p1 <- p1+theme(axis.text.x = element_text(angle=45,hjust=1),legend.position = "none")
+p1+facet_wrap(~order2+training_pop,ncol=4)+
+  scale_fill_manual(values = c("black","#00A087FF","#3C5488FF","#E64B35FF"))+
+  facet_wrap(~order2+training_pop,ncol=4)+
+  theme_karl()+stat_summary(geom="text", fun.y=mean,
+                            aes(label=sprintf("%1.1f", ..y..)),
+                            position=position_nudge(x=0.5), size=3.5)+
+  theme(rect = element_blank(),axis.text.x = element_text(angle=45,hjust=1),legend.position="none")
+
+
